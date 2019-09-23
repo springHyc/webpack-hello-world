@@ -1,0 +1,33 @@
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+module.exports = {
+    // 入口，webpack执行构建的第一步将从entry开始，可抽象成输入。
+    entry: './main.js',
+    // 输出结果，在webpack经过一系列处理并拿得出最终想要的代码后输出结果。
+    output: {
+        filename: 'bundle.js',
+        path: path.resolve(__dirname, './dist')
+    },
+    // 模块，在webpack里一切皆模块，一个模块对应一个文件。webpack会从配置里的entry开始递归找出所有依赖的模块。
+    module: {
+        rules: [
+            // webpack不原生支持解析CSS文件。要支持非JavaScript类型的文件，则需要使用webpack中loader机制。
+            {
+                test: /\.css$/,
+                //  Loader:模块转化器，用于将模块的原内容按照需求转换成新内容。
+                loaders: ExtractTextPlugin.extract({
+                    use: ['css-loader']
+                })
+            }
+        ]
+    },
+    // 扩展插件，在webpack构建流程中的特定时机注入廓镇逻辑，来改变构建结果或做我们想要的事情。
+    plugins: [
+        new ExtractTextPlugin({
+            // webpack4以上版本，包含了contenthash这个关键字段，所以会报错，可以使用md5:contenthash:8来替代
+            filename: `[name]_[md5:contenthash:hex:8].css`
+        })
+    ]
+};
+
+// Chunk: 代码块，一个Chunk由多个模块组合而成，用于代码合并与分割。

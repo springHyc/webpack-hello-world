@@ -1,0 +1,32 @@
+{
+    "name": "webpack-hello-world",
+    "version": "1.0.0",
+    "description": "学习webpack",
+    "main": "main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack-dev-server --hot --devtool source-map"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/springHyc/webpack-hello-world.git"
+    },
+    "keywords": [
+        "webpack",
+        "study"
+    ],
+    "author": "hehe",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/springHyc/webpack-hello-world/issues"
+    },
+    "homepage": "https://github.com/springHyc/webpack-hello-world#readme",
+    "devDependencies": {
+        "css-loader": "^3.2.0",
+        "extract-text-webpack-plugin": "^4.0.0-beta.0",
+        "style-loader": "^1.0.0",
+        "webpack": "^4.40.2",
+        "webpack-cli": "^3.3.9",
+        "webpack-dev-server": "^3.8.1"
+    }
+}
