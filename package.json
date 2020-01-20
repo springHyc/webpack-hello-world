@@ -2,10 +2,11 @@
     "name": "webpack-hello-world",
     "version": "1.0.0",
     "description": "学习webpack",
-    "main": "main.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "webpack-dev-server --hot --devtool source-map"
+        "dev": " webpack-dev-server --hot --devtool source-map",
+        "dist": "NODE_ENV=production webpack --config webpack_dist.config.js",
+        "pub": "npm run dist && rsync dist"
     },
     "repository": {
         "type": "git",
@@ -22,11 +23,29 @@
     },
     "homepage": "https://github.com/springHyc/webpack-hello-world#readme",
     "devDependencies": {
+        "awesome-typescript-loader": "^5.2.1",
+        "babel-core": "^6.26.3",
+        "babel-loader": "^7.1.5",
+        "babel-plugin-transform-runtime": "^6.23.0",
+        "babel-preset-env": "^1.7.0",
+        "babel-preset-react": "^6.24.1",
         "css-loader": "^3.2.0",
         "extract-text-webpack-plugin": "^4.0.0-beta.0",
+        "file-loader": "^4.2.0",
+        "less": "^3.10.3",
+        "less-loader": "^5.0.0",
+        "react": "^16.9.0",
+        "react-dom": "^16.9.0",
         "style-loader": "^1.0.0",
+        "typescript": "^3.6.3",
         "webpack": "^4.40.2",
         "webpack-cli": "^3.3.9",
         "webpack-dev-server": "^3.8.1"
+    },
+    "dependencies": {
+        "@types/react": "^16.9.3",
+        "@types/react-dom": "^16.9.1",
+        "babel-runtime": "^6.26.0",
+        "jsutils-100": "^1.1.0-beta.2"
     }
 }
