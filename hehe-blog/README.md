@@ -19,6 +19,7 @@
 
 - 打包：webpack
 - 启动：npm run build
+- nginx 前端端口 9000， 9001 是不能连接后端的
 
 ## 添加 less 的处理
 
