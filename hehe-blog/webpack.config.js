@@ -1,6 +1,6 @@
 const path = require("path");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // const HappyPack = require("happypack");
 // const os = require("os");
 // const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
@@ -14,13 +14,22 @@ module.exports = {
     filename: "bundle.js",
     path: path.resolve(__dirname, "./dist")
   },
+  resolve: {
+    extensions: [".js", ".jsx"], // 扩展
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+      "@store": path.resolve(__dirname, "src/store")
+    }
+  },
+
   // 模块，在webpack里一切皆模块，一个模块对应一个文件。webpack会从配置里的entry开始递归找出所有依赖的模块。
   module: {
     rules: [
       {
         test: /\.(le|c)ss$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          //   MiniCssExtractPlugin.loader,
+          "style-loader",
           "css-loader", // 编译css
           "less-loader" // 编译less
         ]
@@ -29,19 +38,29 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader",
+        loader: "babel-loader?cacheDirectory",
         options: {
           presets: [
             [
               "@babel/preset-env",
               {
-                useBuiltIns: "usage"
+                useBuiltIns: "usage",
+                corejs: 2
               }
             ]
           ],
           plugins: [
             "@babel/transform-runtime",
-            "@babel/plugin-proposal-class-properties"
+            "@babel/plugin-proposal-class-properties",
+            // 引入antd
+            [
+              "import",
+              {
+                libraryName: "antd",
+                libraryDirectory: "es",
+                style: true // 会加载 less 文件
+              }
+            ]
           ]
         }
       }
@@ -52,14 +71,20 @@ module.exports = {
     new ExtractTextPlugin({
       // webpack4以上版本，包含了contenthash这个关键字段，所以会报错，可以使用md5:contenthash:8来替代
       filename: `[name]_[md5:contenthash:hex:8].css`
-    }),
-    // 单独生成css文件和js文件分离开来 加快页面渲染
-    new MiniCssExtractPlugin({
-      filename: "[name]-[hash:5].css",
-      chunkFilename: "[id]-[hash:5].css"
     })
+    // 单独生成css文件和js文件分离开来 加快页面渲染
+    // new MiniCssExtractPlugin({
+    //   filename: "[name]-[hash:5].css",
+    //   chunkFilename: "[id]-[hash:5].css"
+    // })
   ],
-  devtool: "source-map"
+  devtool: "source-map",
+  devServer: {
+    // 使用https
+    // https: true,
+    port: 9001,
+    hot: true
+  }
 };
 
 // Chunk: 代码块，一个Chunk由多个模块组合而成，用于代码合并与分割。
