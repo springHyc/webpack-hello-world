@@ -1,12 +1,13 @@
 const path = require("path");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // const HappyPack = require("happypack");
 // const os = require("os");
 // const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
 
+const devMode = process.env.NODE_ENV !== "production";
+
 module.exports = {
-  mode: "development",
+  mode: "production", // production\development
   // 入口，webpack执行构建的第一步将从entry开始，可抽象成输入。
   entry: "./index.js",
   // 输出结果，在webpack经过一系列处理并拿得出最终想要的代码后输出结果。
@@ -27,10 +28,15 @@ module.exports = {
     rules: [
       {
         test: /\.(le|c)ss$/,
+        exclude: /node_modules/,
+        include: [
+          path.resolve(__dirname, ".."),
+          path.resolve(__dirname, "src")
+        ],
         use: [
-          //   MiniCssExtractPlugin.loader,
-          "style-loader",
+          MiniCssExtractPlugin.loader,
           "css-loader", // 编译css
+          //   "postcss-loader", // 使用 postcss 为 css 加上浏览器前缀
           "less-loader" // 编译less
         ]
       },
@@ -68,23 +74,15 @@ module.exports = {
   },
   // 扩展插件，在webpack构建流程中的特定时机注入廓镇逻辑，来改变构建结果或做我们想要的事情。
   plugins: [
-    new ExtractTextPlugin({
-      // webpack4以上版本，包含了contenthash这个关键字段，所以会报错，可以使用md5:contenthash:8来替代
-      filename: `[name]_[md5:contenthash:hex:8].css`
-    })
     // 单独生成css文件和js文件分离开来 加快页面渲染
-    // new MiniCssExtractPlugin({
-    //   filename: "[name]-[hash:5].css",
-    //   chunkFilename: "[id]-[hash:5].css"
-    // })
+    new MiniCssExtractPlugin({
+      filename: devMode ? "[name].css" : "[name].[contenthash:8].css",
+      chunkFilename: devMode ? "[id].css" : "[id].[contenthash:8].css"
+    })
   ],
   devtool: "source-map",
   devServer: {
-    // 使用https
-    // https: true,
     port: 9001,
     hot: true
   }
 };
-
-// Chunk: 代码块，一个Chunk由多个模块组合而成，用于代码合并与分割。

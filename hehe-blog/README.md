@@ -21,6 +21,20 @@
 - 启动：npm run build
 - nginx 前端端口 9000， 9001 是不能连接后端的
 
+### MiniCssExtractPlugin
+
+该插件将 CSS 提取到单独的文件中。它为每个包含 CSS 的 JS 文件创建一个 CSS 文件。它支持 CSS 和 SourceMap 的按需加载。
+
+它基于新的 webpack v4 功能（模块类型）构建，并且需要 webpack 4 才能正常工作。
+
+- 安装
+
+`npm install --save-dev mini-css-extract-plugin`
+
+此插件应仅在 production 不包含 style-loader 在加载程序链中的构建中使用，尤其是如果您想在中包含 HMR development。
+
+这是一个将 HMR development 和样式都提取到 production 构建文件中的示例。
+
 ## 添加 less 的处理
 
 npm install less --save-dev
@@ -38,7 +52,7 @@ npm install less-loader --save-dev
       {
         test: /\.(le|c)ss$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          "style-loader", //使用<style>将css-loader内部样式注入到我们的HTML页面
           "css-loader", // 编译css
           "less-loader" // 编译less
         ]
