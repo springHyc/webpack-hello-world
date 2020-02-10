@@ -31,7 +31,7 @@
 
 `npm install --save-dev mini-css-extract-plugin`
 
-此插件应仅在 production 不包含 style-loader 在加载程序链中的构建中使用，尤其是如果您想在中包含 HMR development。
+**此插件应仅在 production 不包含 style-loader 在加载程序链中的构建中使用，尤其是如果您想在中包含 HMR development。**
 
 这是一个将 HMR development 和样式都提取到 production 构建文件中的示例。
 
@@ -57,4 +57,102 @@ npm install less-loader --save-dev
           "less-loader" // 编译less
         ]
       },
+```
+
+## 添加浏览器自动刷新和模块热替换
+
+`webpack.dev.config.js`：
+
+```
+const HotModuleReplacementPlugin = require("webpack/lib/HotModuleReplacementPlugin");
+const DefinePlugin = require("webpack/lib/DefinePlugin");
+module.exports = {
+  watch: true,
+  watchOptions: {
+    // 不监听的文件或文件夹，支持正则匹配
+    // 默认为空
+    ignored: /node_modules/,
+    // 监听到变化发生后会等300ms再去执行动作，防止文件更新太快导致重新编译频率太高
+    // 默认为 300ms
+    aggregateTimeout: 300,
+    // 判断文件是否发生变化是通过不停的去询问系统指定文件有没有变化实现的
+    // 默认每隔1000毫秒询问一次
+    poll: 1000
+  },
+  // 入口，webpack执行构建的第一步将从entry开始，可抽象成输入。
+  entry: {
+    main: [
+      "webpack-dev-server/client?http://localhost:9001/",
+      "webpack/hot/dev-server",
+      "./index.js"
+    ]
+  },
+
+
+  module: {
+      ...
+  },
+  // 扩展插件，在webpack构建流程中的特定时机注入廓镇逻辑，来改变构建结果或做我们想要的事情。
+  plugins: [
+    new HotModuleReplacementPlugin(),
+    ...
+  ],
+  devServer: {
+    port: 9001,
+    hot: true
+  }
+};
+
+```
+
+## 错误处理
+
+1. 运行`webpack`命令时报错
+   ![](./images/QQ20200206-105129@2x.png)
+
+解决办法：
+
+```
+{
+  test: /\.(le|c)ss$/,
+  // exclude: /node_modules/,
+  // include: [
+  //   path.resolve(__dirname, ".."),
+  //   path.resolve(__dirname, "src")
+  // ],
+  use: [
+    // MiniCssExtractPlugin.loader,
+    "style-loader",
+    "css-loader", // 编译css
+    "postcss-loader", // 使用 postcss 为 css 加上浏览器前缀
+    "less-loader" // 编译less
+  ]
+},
+```
+
+在`css-loader`中不能不包括`node_modules`中的处理！！！
+需要验证下：node_modules/antd 是只添加 antd 到 css-loader 中处理还是全部包含好？
+
+2. 控制台更新了，但是浏览器并没有热更新
+
+![](./images/QQ20200206-155634@2x.png)
+
+3. 当 webpack 解析时，`postcss-loader`的使用报错
+
+![](./images/bug3.png)
+
+4. webpack 时报错
+
+```
+WARNING in ./node_modules/antd/es/style/index.less (./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/src!./node_modules/less-loader/dist/cjs.js!./node_modules/antd/es/style/index.less)
+Module Warning (from ./node_modules/postcss-loader/src/index.js):
+Warning
+
+(639:3) variable '--antd-wave-shadow-color' is undefined and used without a fallback
+ @ ./node_modules/antd/es/style/index.less 2:26-153 22:4-35:5 25:25-152
+ @ ./node_modules/antd/es/layout/style/index.js
+ @ ./src/layouts/index.js
+ @ ./src/App.js
+ @ ./index.js
+ @ multi webpack-dev-server/client?http://localhost:9001/ webpack/hot/dev-server ./index.js
 ```

@@ -1,15 +1,10 @@
 const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HotModuleReplacementPlugin = require("webpack/lib/HotModuleReplacementPlugin");
 const DefinePlugin = require("webpack/lib/DefinePlugin");
-// const HappyPack = require("happypack");
-// const os = require("os");
-// const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
 
 const devMode = process.env.NODE_ENV !== "production";
-console.log("======process.env.NODE_ENV======", process.env.NODE_ENV);
+
 module.exports = {
-  mode: "development", // production\development
   watch: true,
   watchOptions: {
     // 不监听的文件或文件夹，支持正则匹配
@@ -22,6 +17,7 @@ module.exports = {
     // 默认每隔1000毫秒询问一次
     poll: 1000
   },
+  mode: "development", // production\development
   // 入口，webpack执行构建的第一步将从entry开始，可抽象成输入。
   entry: {
     main: [
@@ -51,15 +47,7 @@ module.exports = {
         test: /\.(le|c)ss$/,
         use: [
           // MiniCssExtractPlugin.loader,
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              //热模块重装（HMR）
-              // hmr: process.env.NODE_ENV === "development"
-              hnr: true,
-              reloadAll: true
-            }
-          },
+          "style-loader",
           "css-loader", // 编译css
           "postcss-loader", // 使用 postcss 为 css 加上浏览器前缀
           "less-loader" // 编译less
@@ -99,11 +87,6 @@ module.exports = {
   },
   // 扩展插件，在webpack构建流程中的特定时机注入廓镇逻辑，来改变构建结果或做我们想要的事情。
   plugins: [
-    // 单独生成css文件和js文件分离开来 加快页面渲染
-    new MiniCssExtractPlugin({
-      filename: devMode ? "[name].css" : "[name].[contenthash:8].css",
-      chunkFilename: devMode ? "[id].css" : "[id].[contenthash:8].css"
-    }),
     new HotModuleReplacementPlugin(),
     new DefinePlugin({
       // 定义 NODE_ENV 环境变量为 production
