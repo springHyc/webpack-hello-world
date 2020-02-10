@@ -4,7 +4,6 @@ node_modules/
 npm-debug.log
 .DS_Store
 build.json
-build/
 deploy/
 !jquery-ui.min.css
 .vscode/
