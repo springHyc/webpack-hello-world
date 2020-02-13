@@ -8,18 +8,159 @@
 
 - 解决 es6\less\antd 的打包问题
 
-## todo
-
-- 打出来的 css 文件如何引入项目?!
-  - 使用`style-loader`可以直接把 css 打进 js 文件中
-- 学些`.babelrc`的配置
-- 学习 nginx 的启动之类的
-
 ## 命令
 
 - 打包：webpack
 - 启动：npm run build
 - nginx 前端端口 9000， 9001 是不能连接后端的
+
+## 错误处理
+
+1. 运行`webpack`命令时报错
+   ![](./images/QQ20200206-105129@2x.png)
+
+解决办法：
+
+```json
+{
+  test: /\.(le|c)ss$/,
+  // exclude: /node_modules/,
+  // include: [
+  //   path.resolve(__dirname, ".."),
+  //   path.resolve(__dirname, "src")
+  // ],
+  use: [
+    // MiniCssExtractPlugin.loader,
+    "style-loader",
+    "css-loader", // 编译css
+    "postcss-loader", // 使用 postcss 为 css 加上浏览器前缀
+    "less-loader" // 编译less
+  ]
+},
+```
+
+在`css-loader`中不能不包括`node_modules`中的处理！！！
+需要验证下：node_modules/antd 是只添加 antd 到 css-loader 中处理还是全部包含好？
+
+2. 控制台更新了，但是浏览器并没有热更新
+
+![](./images/QQ20200206-155634@2x.png)
+
+<a href="#hot">解决办法</a>
+
+3. 当 webpack 解析时，`postcss-loader`的使用报错
+
+![](./images/bug3.png)
+
+4. webpack 时报错
+
+```shell
+WARNING in ./node_modules/antd/es/style/index.less (./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/src!./node_modules/less-loader/dist/cjs.js!./node_modules/antd/es/style/index.less)
+Module Warning (from ./node_modules/postcss-loader/src/index.js):
+Warning
+
+(639:3) variable '--antd-wave-shadow-color' is undefined and used without a fallback
+ @ ./node_modules/antd/es/style/index.less 2:26-153 22:4-35:5 25:25-152
+ @ ./node_modules/antd/es/layout/style/index.js
+ @ ./src/layouts/index.js
+ @ ./src/App.js
+ @ ./index.js
+ @ multi webpack-dev-server/client?http://localhost:9001/ webpack/hot/dev-server ./index.js
+```
+
+这事是警告，并不是报错，如果不想看这些警告，可以在`postcss.config.js`将警告不展示:
+
+```json
+"postcss-cssnext": {
+  features: {
+    customProperties: {
+      warnings: false
+    }
+  }
+},
+```
+
+5. 将`postcss-loade`的一些配置信息放到 webpack.config.js 中，再`webpack`就报错：
+
+```shell
+ERROR in ./node_modules/antd/es/style/index.less (./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/src??postcss!./node_modules/less-loader/dist/cjs.js!./node_modules/antd/es/style/index.less)
+Module build failed (from ./node_modules/postcss-loader/src/index.js):
+TypeError: Cannot read property 'length' of undefined
+    at /Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/antd/es/style/index.less:310:1
+    at /Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/postcss-minify-selectors/dist/index.js:186:35
+    at /Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/postcss/lib/container.js:239:18
+    at /Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/postcss/lib/container.js:135:18
+    at Root.each (/Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/postcss/lib/container.js:101:16)
+    at Root.walk (/Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/postcss/lib/container.js:131:17)
+    at Root.walkRules (/Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/postcss/lib/container.js:237:19)
+    at /Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/postcss-minify-selectors/dist/index.js:181:13
+    at initializePlugin (/Users/heyingchun/study/webpack-hello-world/hehe-blog/node_modules/cssnano/dist/index.js:31:51)
+ @ ./node_modules/antd/es/style/index.less 2:26-162 22:4-35:5 25:25-161
+ @ ./node_modules/antd/es/layout/style/index.js
+ @ ./src/layouts/index.js
+ @ ./src/App.js
+ @ ./index.js
+ @ multi webpack-dev-server/client?http://localhost:9001/ webpack/hot/dev-server ./index.js
+```
+
+而`postcss-loader`的配置是：
+
+```json
+
+        test: /\.(le|c)ss$/,
+        use: [
+          // MiniCssExtractPlugin.loader,
+          "style-loader",
+          "css-loader", // 编译css
+          // "postcss-loader", // 使用 postcss 为 css 加上浏览器前缀
+          {
+            loader: "postcss-loader",
+            options: {
+              ident: "postcss",
+              plugins: loader => [
+                require("postcss-import")({}),
+                require("postcss-preset-env")(),
+                require("postcss-cssnext")({
+                  features: {
+                    customProperties: {
+                      warnings: false
+                    }
+                  }
+                }),
+                require("cssnano")()
+              ]
+            }
+          },
+          "less-loader" // 编译less
+        ]
+      },
+```
+
+这个报错的原因是，是用了`require("postcss-preset-env")()`,将其屏蔽后就可以啦。
+
+## 插件使用
+
+### 如何使用`@font-face`
+
+这样处理文件即可。将文件打包进 dist 中
+
+```json
+{
+  test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf|otf)$/,
+  use: [
+    {
+      loader: "file-loader",
+      options: {
+        // dev 可以这样，正式不行
+        name: "[name].[ext]", // 原本的名字和后缀
+        outputPath: "assets/fonts"
+      }
+    }
+  ]
+},
+```
+
+但是发现项目中没有必要这样使用，所以讲@font-face 的内容删除了。
 
 ### MiniCssExtractPlugin
 
@@ -35,7 +176,7 @@
 
 这是一个将 HMR development 和样式都提取到 production 构建文件中的示例。
 
-## 添加 less 的处理
+### 添加 less 的处理
 
 npm install less --save-dev
 npm install less-loader --save-dev
@@ -59,11 +200,11 @@ npm install less-loader --save-dev
       },
 ```
 
-## 添加浏览器自动刷新和模块热替换
+## <div id="hot">添加浏览器自动刷新和模块热替换</div>
 
 `webpack.dev.config.js`：
 
-```
+```json
 const HotModuleReplacementPlugin = require("webpack/lib/HotModuleReplacementPlugin");
 const DefinePlugin = require("webpack/lib/DefinePlugin");
 module.exports = {
@@ -103,56 +244,4 @@ module.exports = {
   }
 };
 
-```
-
-## 错误处理
-
-1. 运行`webpack`命令时报错
-   ![](./images/QQ20200206-105129@2x.png)
-
-解决办法：
-
-```
-{
-  test: /\.(le|c)ss$/,
-  // exclude: /node_modules/,
-  // include: [
-  //   path.resolve(__dirname, ".."),
-  //   path.resolve(__dirname, "src")
-  // ],
-  use: [
-    // MiniCssExtractPlugin.loader,
-    "style-loader",
-    "css-loader", // 编译css
-    "postcss-loader", // 使用 postcss 为 css 加上浏览器前缀
-    "less-loader" // 编译less
-  ]
-},
-```
-
-在`css-loader`中不能不包括`node_modules`中的处理！！！
-需要验证下：node_modules/antd 是只添加 antd 到 css-loader 中处理还是全部包含好？
-
-2. 控制台更新了，但是浏览器并没有热更新
-
-![](./images/QQ20200206-155634@2x.png)
-
-3. 当 webpack 解析时，`postcss-loader`的使用报错
-
-![](./images/bug3.png)
-
-4. webpack 时报错
-
-```
-WARNING in ./node_modules/antd/es/style/index.less (./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/src!./node_modules/less-loader/dist/cjs.js!./node_modules/antd/es/style/index.less)
-Module Warning (from ./node_modules/postcss-loader/src/index.js):
-Warning
-
-(639:3) variable '--antd-wave-shadow-color' is undefined and used without a fallback
- @ ./node_modules/antd/es/style/index.less 2:26-153 22:4-35:5 25:25-152
- @ ./node_modules/antd/es/layout/style/index.js
- @ ./src/layouts/index.js
- @ ./src/App.js
- @ ./index.js
- @ multi webpack-dev-server/client?http://localhost:9001/ webpack/hot/dev-server ./index.js
 ```
