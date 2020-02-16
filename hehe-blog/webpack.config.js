@@ -1,45 +1,26 @@
-const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const HotModuleReplacementPlugin = require("webpack/lib/HotModuleReplacementPlugin");
-const DefinePlugin = require("webpack/lib/DefinePlugin");
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const DefinePlugin = require('webpack/lib/DefinePlugin');
 // const HappyPack = require("happypack");
 // const os = require("os");
 // const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
 
-const devMode = process.env.NODE_ENV !== "production";
-console.log("======process.env.NODE_ENV======", process.env.NODE_ENV);
+const devMode = process.env.NODE_ENV !== 'production';
+console.log('======process.env.NODE_ENV======', process.env.NODE_ENV);
 module.exports = {
-  mode: "development", // production\development
-  watch: true,
-  watchOptions: {
-    // 不监听的文件或文件夹，支持正则匹配
-    // 默认为空
-    ignored: /node_modules/,
-    // 监听到变化发生后会等300ms再去执行动作，防止文件更新太快导致重新编译频率太高
-    // 默认为 300ms
-    aggregateTimeout: 300,
-    // 判断文件是否发生变化是通过不停的去询问系统指定文件有没有变化实现的
-    // 默认每隔1000毫秒询问一次
-    poll: 1000
-  },
+  mode: 'production', // production\development
   // 入口，webpack执行构建的第一步将从entry开始，可抽象成输入。
-  entry: {
-    main: [
-      "webpack-dev-server/client?http://localhost:9001/",
-      "webpack/hot/dev-server",
-      "./index.js"
-    ]
-  },
+  entry: './index.js',
   // 输出结果，在webpack经过一系列处理并拿得出最终想要的代码后输出结果。
   output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "./dist")
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, './dist')
   },
   resolve: {
-    extensions: [".js", ".jsx"], // 扩展
+    extensions: ['.js', '.jsx'], // 扩展
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@store": path.resolve(__dirname, "src/store")
+      '@': path.resolve(__dirname, 'src'),
+      '@store': path.resolve(__dirname, 'src/store')
     }
   },
 
@@ -60,35 +41,35 @@ module.exports = {
               reloadAll: true
             }
           },
-          "css-loader", // 编译css
-          "postcss-loader", // 使用 postcss 为 css 加上浏览器前缀
-          "less-loader" // 编译less
+          'css-loader', // 编译css
+          'postcss-loader', // 使用 postcss 为 css 加上浏览器前缀
+          'less-loader' // 编译less
         ]
       },
 
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader?cacheDirectory",
+        loader: 'babel-loader?cacheDirectory',
         options: {
           presets: [
             [
-              "@babel/preset-env",
+              '@babel/preset-env',
               {
-                useBuiltIns: "usage",
+                useBuiltIns: 'usage',
                 corejs: 2
               }
             ]
           ],
           plugins: [
-            "@babel/transform-runtime",
-            "@babel/plugin-proposal-class-properties",
+            '@babel/transform-runtime',
+            '@babel/plugin-proposal-class-properties',
             // 引入antd
             [
-              "import",
+              'import',
               {
-                libraryName: "antd",
-                libraryDirectory: "es",
+                libraryName: 'antd',
+                libraryDirectory: 'es',
                 style: true // 会加载 less 文件
               }
             ]
@@ -101,20 +82,17 @@ module.exports = {
   plugins: [
     // 单独生成css文件和js文件分离开来 加快页面渲染
     new MiniCssExtractPlugin({
-      filename: devMode ? "[name].css" : "[name].[contenthash:8].css",
-      chunkFilename: devMode ? "[id].css" : "[id].[contenthash:8].css"
+      filename: devMode ? '[name].css' : '[name].[contenthash:8].css',
+      chunkFilename: devMode ? '[id].css' : '[id].[contenthash:8].css'
     }),
-    new HotModuleReplacementPlugin(),
     new DefinePlugin({
       // 定义 NODE_ENV 环境变量为 production
-      "process.env": {
-        NODE_ENV: JSON.stringify("development")
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
       }
     })
   ],
-  devtool: "source-map",
   devServer: {
-    port: 9001,
-    hot: true
+    port: 9001
   }
 };

@@ -140,6 +140,23 @@ TypeError: Cannot read property 'length' of undefined
 
 ## 插件使用
 
+### postcss-loader
+
+更加推荐使用`postcss.config.js`来进行配置。
+
+它的自定义路径的不好使,查了很多资料说是要改变 webpack 的基本配置：https://github.com/symfony/webpack-encore/issues/129才行。
+
+```js
+{
+  loader: 'postcss-loader',
+  options: {
+    config: {
+      path: './configs/postcss.config.js'
+    }
+  }
+},
+```
+
 ### 如何使用`@font-face`
 
 这样处理文件即可。将文件打包进 dist 中

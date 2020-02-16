@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 export default function Introduction() {
   return (
     <div>
-      <h2>简介</h2>
+      <h2>简介2</h2>
       <p>
         展示旅游规划以及旅游中的美好记录。照片墙来展示那么漂亮的照片。再有就是展示一些自己的东西，博客嘛
       </p>
