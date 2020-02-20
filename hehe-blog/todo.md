@@ -15,6 +15,14 @@
 - [ ] 如何在配置文件中配置是`dev`环境还是`production`环境？
 - [ ] 自己写一个 loader
       webpack 是运行在 Node.js 上的，一个 Loader 其实就是一个 Node.js 模块，这个模块需要导出一个函数。
+- [ ] 压缩 JavaScript : UglifyJS or 4-4 使用 ParallelUglifyPlugin
+- [ ] webpack-dev-server 命令参数的学习
+  - --open : 打开浏览器
+- [ ] Code splitting
+
+  > For big web apps, it’s not efficient to put all code into a single file. Webpack allows you to split a large JS file into several chunks. Especially, if some blocks of code are only required under some circumstances, these chunks could be loaded on demand.
+
+  > Webpack uses require.ensure to define a split point
 
 ## 知识点
 
