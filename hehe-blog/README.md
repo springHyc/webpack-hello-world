@@ -4,6 +4,21 @@
 
 ## 版本变更记录
 
+### 1.0.2
+
+- 添加 webpack-bundle-analyzer 性能分析
+
+使用方式：`npm run build-dev --report`
+
+#### 参数解析
+
+- stat size
+  这个大小是在进行压缩等转换之前的输入文件大小；它叫做 stat 大小，是因为它是从 webpack 的[stat](https://webpack.js.org/configuration/stats/)对象里得到的。
+- parsed size
+  这个是你的文件最终的输出的尺寸大小。如果你正在使用 Uglify 等插件，这个值将会是你代码打包的最小尺寸。
+- gzipped size
+  这个大小是你的包经过 gzip 压缩后的大小
+
 ### 1.0.1
 
 - 解决 es6\less\antd 的打包问题

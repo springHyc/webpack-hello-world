@@ -19,6 +19,7 @@
 - [ ] webpack-dev-server 命令参数的学习
   - --open : 打开浏览器
 - [ ] Code splitting
+- [x] 添加 webpack-bundle-analyzer 性能分析
 
   > For big web apps, it’s not efficient to put all code into a single file. Webpack allows you to split a large JS file into several chunks. Especially, if some blocks of code are only required under some circumstances, these chunks could be loaded on demand.
 

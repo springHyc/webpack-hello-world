@@ -1,6 +1,6 @@
 {
   "name": "hehe-blog",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "blog（非脚手架版本）",
   "main": "app.js",
   "scripts": {
@@ -57,6 +57,7 @@
     "redux": "^4.0.3",
     "redux-saga": "^1.0.5",
     "style-loader": "^1.0.0",
+    "webpack-bundle-analyzer": "^3.9.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.3"
   },
